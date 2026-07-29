@@ -1,3 +1,4 @@
+import { reactive } from "vue"
 import {
   Wallet,
   ArrowUpRight,
@@ -42,7 +43,7 @@ export const summaries = [
   },
 ]
 
-export const transactionGroups = [
+export const transactionGroups = reactive([
   {
     label: "HARI INI",
     date: "Selasa, 21 Juli 2026",
@@ -127,17 +128,59 @@ export const transactionGroups = [
       },
     ],
   },
-]
+])
 
-const addTransaction = (form) =>{
-  if(form.type === "income"){
-    transactionGroups[0].transactions.unshift({
-      id: `trx-${Date.now()}`,
-      title:form.title,
-      category:form.category,
-      amount:`Rp ${Number(form.amount).toLocaleString("id-ID")}`,
-      type:form.type,
-      time:new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB"
-    })
+const categoryConfig = {
+  makanan: {
+    label: "Makanan",
+    icon: Utensils,
+    bgColor: "bg-orange-50",
+    iconColor: "text-orange-500",
+  },
+  transport: {
+    label: "Transport",
+    icon: Car,
+    bgColor: "bg-blue-50",
+    iconColor: "text-blue-500",
+  },
+  belanja: {
+    label: "Belanja",
+    icon: ShoppingBag,
+    bgColor: "bg-purple-50",
+    iconColor: "text-purple-500",
+  },
+  tagihan: {
+    label: "Tagihan",
+    icon: CreditCard,
+    bgColor: "bg-sky-50",
+    iconColor: "text-sky-500",
+  },
+}
+
+export const addTransaction = (form) => {
+  const normalizedCategory = String(form.category || "").toLowerCase()
+  const category = categoryConfig[normalizedCategory] || {
+    label: form.category ? String(form.category) : "Lainnya",
+    icon: form.type === "income" ? Banknote : ShoppingBag,
+    bgColor: form.type === "income" ? "bg-emerald-50" : "bg-rose-50",
+    iconColor: form.type === "income" ? "text-emerald-500" : "text-rose-500",
   }
+
+  const amountNumber = Number(String(form.amount || "").replace(/[^0-9]/g, ""))
+  const formattedAmount = `Rp ${isNaN(amountNumber) ? "0" : amountNumber.toLocaleString("id-ID")}`
+
+  transactionGroups[0].transactions.unshift({
+    id: `trx-${Date.now()}`,
+    title: form.title || category.label,
+    category: category.label,
+    amount: formattedAmount,
+    type: form.type,
+    icon: category.icon,
+    bgColor: category.bgColor,
+    iconColor: category.iconColor,
+    time: new Date().toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }) + " WIB",
+  })
 }

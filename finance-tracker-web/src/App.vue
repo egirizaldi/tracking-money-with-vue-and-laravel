@@ -1,12 +1,13 @@
 <script setup>
 import Sidebar from './components/Sidebar.vue';
 import { ref } from 'vue';
-import addTransaction from './components/addTransaction/addTransaction.vue';
+import AddTransactionModal from './components/addTransaction/addTransaction.vue';
+import { addTransaction as addTransactionToList } from './components/Home/homeData.js';
 
 const isModalOpen = ref(false)
 
 const handleSaveTransaction = (newTransaction) => {
-  console.log('Data transaksi baru:',newTransaction)
+  addTransactionToList(newTransaction)
 }
 
 
@@ -20,10 +21,11 @@ const handleSaveTransaction = (newTransaction) => {
     <main class="flex-1 p-8 overflow-y-auto">
       <router-view />
     </main>
-    <addTransaction
-    :is-open="isModalOpen"
-    @close="isModalOpen=false"
-    @submit="handleSaveTransaction"/>
+    <AddTransactionModal
+      :is-open="isModalOpen"
+      @close="isModalOpen=false"
+      @submit="handleSaveTransaction"
+    />
 
   </div>
  
